@@ -21,7 +21,8 @@ package com.merrycat.utils
 		public static function addChildUnder(target:DisplayObject, parent:DisplayObjectContainer, referTarget:DisplayObject) : void
 		{
 			var parentIdx : int = parent.getChildIndex(referTarget);
-			var toIdx : int = parentIdx - 1;
+			
+			var toIdx : int = parentIdx;
 			if(toIdx < 0)
 			{
 				toIdx = 0;

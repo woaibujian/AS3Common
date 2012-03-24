@@ -1,5 +1,8 @@
 package com.merrycat.display.plane 
 {
+	import flash.geom.Point;
+	import flash.display.DisplayObjectContainer;
+	import flash.geom.Rectangle;
 	import com.greensock.TweenLite;
 	import com.merrycat.resize.MResizer;
 
@@ -23,9 +26,26 @@ package com.merrycat.display.plane
 		private var _orginY : Number;
 		private var _reverse : Boolean;
 		
-		public function MMovePlane(target : Sprite, reverse:Boolean = false)
+		private var _customContainer : DisplayObjectContainer;
+		private var _customRect : Rectangle;
+		
+		public function MMovePlane(target : Sprite, reverse:Boolean = false, customContainer:DisplayObjectContainer = null, customRect:Rectangle = null)
 		{
 			super(target);
+			
+			if(customRect)
+			{
+				_customRect = customRect;	
+			}
+			
+			if(customContainer)
+			{
+				_customContainer = customContainer;
+				if(!_customRect)
+				{
+					_customRect = new Rectangle(_customContainer.x, _customContainer.y, _customContainer.width, _customContainer.height);
+				}
+			}
 			
 			_x = target.x;
 			_y = target.y;
@@ -51,14 +71,42 @@ package com.merrycat.display.plane
 		
 		override protected function onRender(e : Event) : void 
 		{
+			var mousex:Number;
+			var mousey:Number;
+			var maxw:Number;
+			var maxh:Number;
+			
+			var center:Point;
+			
+			if(_customContainer)
+			{
+				mousex = _customContainer.mouseX;
+				if(mousex < 0) mousex = 0;
+				
+				mousey = _customContainer.mouseY;
+				if(mousey < 0) mousey = 0;
+				
+				maxw = _customRect.width;
+				maxh = _customRect.height;
+				
+				center = new Point(maxw / 2, maxh / 2);
+			}else
+			{
+				mousex = StageReference.getStage().mouseX;
+				mousey = StageReference.getStage().mouseY;
+				maxw = StageReference.getStage().stageWidth;
+				maxh = StageReference.getStage().stageHeight;
+				center = new Point(MResizer.defaultRect.width / 2, MResizer.defaultRect.height / 2);
+			}
+			
 			if(xAxisDegree != 0)
 			{
 				if(!_reverse)
 				{
-					_x = _orginX - (StageReference.getStage().mouseX - MResizer.defaultRect.width / 2) / (StageReference.getStage().stageWidth / 2) * xAxisDegree;
+					_x = _orginX - (mousex - maxw / 2) / (maxw / 2) * xAxisDegree;
 				}else
 				{
-					_x = _orginX + (StageReference.getStage().mouseX - MResizer.defaultRect.width / 2) / (StageReference.getStage().stageWidth / 2) * xAxisDegree;
+					_x = _orginX + (mousex - maxw / 2) / (maxw / 2) * xAxisDegree;
 				}
 				target.x += (_x - target.x) * 0.1; 
 			}
@@ -67,10 +115,10 @@ package com.merrycat.display.plane
 			{
 				if(!_reverse)
 				{
-					_y = _orginY - (StageReference.getStage().mouseY - MResizer.defaultRect.height / 2) / (StageReference.getStage().stageHeight / 2) * yAxisDegree;
+					_y = _orginY - (mousey - maxh / 2) / (maxh / 2) * yAxisDegree;
 				}else
 				{
-					_y = _orginY + (StageReference.getStage().mouseY - MResizer.defaultRect.height / 2) / (StageReference.getStage().stageHeight / 2) * yAxisDegree;
+					_y = _orginY + (mousey - maxh / 2) / (maxh / 2) * yAxisDegree;
 				}
 				target.y += (_y - target.y) * 0.1; 
 			}

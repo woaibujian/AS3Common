@@ -1,5 +1,6 @@
 package com.merrycat.display.plane 
 {
+	import com.greensock.TweenLite;
 	import com.merrycat.utils.MNumberUtils;
 	import org.casalib.time.EnterFrame;
 	import flash.display.Sprite;
@@ -29,9 +30,27 @@ package com.merrycat.display.plane
 			
 			EnterFrame.getInstance().addEventListener(Event.ENTER_FRAME, onRender);
 		}
+		
+		public function pause():void
+		{
+			TweenLite.killDelayedCallsTo(startRender);
+			EnterFrame.getInstance().removeEventListener(Event.ENTER_FRAME, onRender);
+		}
+		
+		public function resume(afterSec:Number = 0) : void
+		{
+			TweenLite.killDelayedCallsTo(startRender);
+			TweenLite.delayedCall(afterSec, startRender);
+		}
+
+		private function startRender() : void
+		{
+			EnterFrame.getInstance().addEventListener(Event.ENTER_FRAME, onRender);
+		}
 
 		public function stop(onBackToCenterCall:Function = null) : void 
 		{
+			TweenLite.killDelayedCallsTo(startRender);
 			this.onBackToCenterCall = onBackToCenterCall;
 			EnterFrame.getInstance().removeEventListener(Event.ENTER_FRAME, onRender);
 		}
@@ -42,6 +61,7 @@ package com.merrycat.display.plane
 		
 		protected function onRemove(e : Event) : void 
 		{
+			TweenLite.killDelayedCallsTo(startRender);
 			EnterFrame.getInstance().removeEventListener(Event.ENTER_FRAME, onRender);
 		}
 	}
